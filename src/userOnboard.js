@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import database from "./firebase"; // Assuming the correct path to your configuration file
-import { ref, get } from "firebase/database";
+import { ref, get, set } from "firebase/database";
 
 export default function Onboarding() {
   const [step, setStep] = useState(1);
@@ -26,8 +26,6 @@ export default function Onboarding() {
           const sortedSteps = Object.entries(configObject)
             .map(([field_name, stepNumber]) => ({ field_name, stepNumber }))
             .sort((a, b) => a.stepNumber - b.stepNumber);
-
-          console.log("Sorted Steps:", sortedSteps);
           setStepConfig(sortedSteps);
         } else {
           console.log("No data available");
@@ -43,14 +41,35 @@ export default function Onboarding() {
   const handlePrev = () => setStep((prev) => prev - 1);
 
   const handleChange = (e) => {
+    e.preventDefault();
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  function revert(){
+    setStep(1)
+    setFormData({
+      email: '',
+      password: '',
+      aboutMe: '',
+      address: { street: '', city: '', state: '', zip: '' },
+      birthdate: '',
+    })
+  } 
+
   const handleSubmit = async () => {
     try {
-    //   await axios.post('/api/users', formData);
-      alert('Onboarding complete!');
+      console.log("FORM", formData)
+
+      // // Reference the specific component in the database
+      const componentRef = ref(database, `Onboarding/${formData.email}`);
+
+      // // Update the step number in Firebase
+      set(componentRef, formData);
+
+      revert();
+
+      alert('Onboarding complete!');      
     } catch (error) {
       console.error('Error submitting data:', error);
       alert('There was an error. Please try again.');
@@ -65,7 +84,6 @@ export default function Onboarding() {
 
     if (currentSteps.length === 0) return <div>Step not found</div>;
 
-    console.log("Current Steps:", currentSteps);
     return (
       <div>
         {currentSteps.map((stepItem, index) => {
