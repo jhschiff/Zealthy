@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import database from "./firebase"; // Assuming the correct path to your configuration file
+import { ref, get } from "firebase/database";
 
 export default function DataTable() {
   const [userData, setUserData] = useState([]);
@@ -6,9 +8,15 @@ export default function DataTable() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('/api/users'); // Replace with your API endpoint
-        const data = await response.json();
-        setUserData(data);
+        const dataRef = ref(database, "Onboarding");
+        const snapshot = await get(dataRef);
+        if (snapshot.exists()) {
+          const configObject = snapshot.val();
+          const users = Object.values(configObject);
+          setUserData(users);
+        } else {
+          console.log("No data available");
+        }
       } catch (error) {
         console.error('Error fetching user data:', error);
       }

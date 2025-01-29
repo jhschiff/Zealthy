@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import database from "./firebase"; // Assuming the correct path to your configuration file
 import { ref, get, set } from "firebase/database";
+import { v4 as uuidv4 } from 'uuid';
 
 export default function Onboarding() {
   const [step, setStep] = useState(1);
@@ -59,10 +60,14 @@ export default function Onboarding() {
 
   const handleSubmit = async () => {
     try {
-      console.log("FORM", formData)
+      // console.log("FORM", formData)
+      
+      // Create a random UUID for the new record
+      const uniqueKey = uuidv4();
+
 
       // // Reference the specific component in the database
-      const componentRef = ref(database, `Onboarding/${formData.email}`);
+      const componentRef = ref(database, `Onboarding/${uniqueKey}`);
 
       // // Update the step number in Firebase
       set(componentRef, formData);
