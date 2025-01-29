@@ -42,7 +42,7 @@ export default function Onboarding() {
   const handlePrev = () => setStep((prev) => prev - 1);
 
   const handleChange = (e) => {
-    e.preventDefault();
+    // e.preventDefault();
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
