@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-// import axios from 'axios';
+import database from "./firebase"; // Assuming the correct path to your configuration file
+import { ref, get } from "firebase/database";
 
 export default function Onboarding() {
   const [step, setStep] = useState(1);
@@ -13,14 +14,26 @@ export default function Onboarding() {
   });
 
   useEffect(() => {
-    // Fetch step configuration from backend
     async function fetchStepConfig() {
       try {
-        const response = await fetch('/api/steps'); // Replace with your API endpoint
-        const data = await response.json();
-        setStepConfig(data);
+        // // Reference to the specific collection in the database
+        const pagesRef = ref(database, "Pages");
+        const snapshot = await get(pagesRef);
+        if (snapshot.exists()) {
+          const configObject = snapshot.val();
+
+          // Convert object to array of steps, sorted by step order
+          const sortedSteps = Object.entries(configObject)
+            .map(([field_name, stepNumber]) => ({ field_name, stepNumber }))
+            .sort((a, b) => a.stepNumber - b.stepNumber);
+
+          console.log("Sorted Steps:", sortedSteps);
+          setStepConfig(sortedSteps);
+        } else {
+          console.log("No data available");
+        }
       } catch (error) {
-        console.error('Failed to fetch step configuration:', error);
+        console.error("Failed to fetch step configuration:", error);
       }
     }
     fetchStepConfig();
@@ -45,19 +58,32 @@ export default function Onboarding() {
   };
 
   const renderStep = () => {
-    const currentStep = stepConfig[step - 1];
-    switch (currentStep?.field_name) {
-      case 'emailPassword':
-        return <EmailAndPassword formData={formData} handleChange={handleChange} />;
-      case 'aboutMe':
-        return <AboutMe formData={formData} handleChange={handleChange} />;
-      case 'address':
-        return <Address formData={formData} setFormData={setFormData} />;
-      case 'birthdate':
-        return <Birthdate formData={formData} handleChange={handleChange} />;
-      default:
-        return <div>Loading...</div>;
-    }
+    if (stepConfig.length === 0) return <div>Loading...</div>;
+
+    // Find all steps that match the current step number
+    const currentSteps = stepConfig.filter(stepItem => stepItem.stepNumber === step);
+
+    if (currentSteps.length === 0) return <div>Step not found</div>;
+
+    console.log("Current Steps:", currentSteps);
+    return (
+      <div>
+        {currentSteps.map((stepItem, index) => {
+          switch (stepItem.field_name) {
+            case "emailPassword":
+              return <EmailAndPassword key={index} formData={formData} handleChange={handleChange} />;
+            case "AboutMe":
+              return <AboutMe key={index} formData={formData} handleChange={handleChange} />;
+            case "Address":
+              return <Address key={index} formData={formData} setFormData={setFormData} />;
+            case "Birthdate":
+              return <Birthdate key={index} formData={formData} handleChange={handleChange} />;
+            default:
+              return <div key={index}>Unknown Step</div>;
+          }
+        })}
+      </div>
+    );
   };
 
   function EmailAndPassword({ formData, handleChange }) {
