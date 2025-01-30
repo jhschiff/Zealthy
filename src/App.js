@@ -7,7 +7,6 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 function App() {
   return (
     <div className="App">
-       <>
          <Routes>
             <Route path="/" element={<Onboarding />} />
             <Route path="/admin" element={<Admin />} />
@@ -16,7 +15,6 @@ function App() {
              {/* default redirect to home page */}
             <Route path="*" element={<Navigate to="/" />} />
          </Routes>
-      </>
     </div>
   );
 }
