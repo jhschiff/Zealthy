@@ -1,7 +1,118 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import database from "./firebase"; // Assuming the correct path to your configuration file
 import { ref, get, set } from "firebase/database";
 import { v4 as uuidv4 } from 'uuid';
+
+function EmailAndPassword({ formData, handleChange }) {
+  return (
+    <div>
+      <input
+        type="email"
+        name="email"
+        placeholder="Email"
+        value={formData.email}
+        onChange={handleChange}
+        className="block mb-4 p-2 border border-gray-300 rounded-lg w-64"
+      />
+      <input
+        type="password"
+        name="password"
+        placeholder="Password"
+        value={formData.password}
+        onChange={handleChange}
+        className="block mb-4 p-2 border border-gray-300 rounded-lg w-64"
+      />
+    </div>
+  );
+}
+
+function AboutMe({ formData, handleChange }) {
+  return (
+    <div>
+      <textarea
+        name="aboutMe"
+        placeholder="About Me"
+        value={formData.aboutMe}
+        onChange={handleChange}
+        className="block mb-4 p-2 border border-gray-300 rounded-lg w-64 h-24"
+      />
+    </div>
+  );
+}
+
+function Address({ formData, setFormData }) {
+  return (
+    <div className="grid grid-cols-2 gap-4">
+      <input
+        type="text"
+        name="street"
+        placeholder="Street Address"
+        value={formData.address.street}
+        onChange={(e) =>
+          setFormData((prev) => ({
+            ...prev,
+            address: { ...prev.address, street: e.target.value },
+          }))
+        }
+        className="p-2 border border-gray-300 rounded-lg"
+      />
+      <input
+        type="text"
+        name="city"
+        placeholder="City"
+        value={formData.address.city}
+        onChange={(e) =>
+          setFormData((prev) => ({
+            ...prev,
+            address: { ...prev.address, city: e.target.value },
+          }))
+        }
+        className="p-2 border border-gray-300 rounded-lg"
+      />
+      <input
+        type="text"
+        name="state"
+        placeholder="State"
+        value={formData.address.state}
+        onChange={(e) =>
+          setFormData((prev) => ({
+            ...prev,
+            address: { ...prev.address, state: e.target.value },
+          }))
+        }
+        className="p-2 border border-gray-300 rounded-lg"
+      />
+      <input
+        type="text"
+        name="zip"
+        placeholder="ZIP Code"
+        value={formData.address.zip}
+        onChange={(e) =>
+          setFormData((prev) => ({
+            ...prev,
+            address: { ...prev.address, zip: e.target.value },
+          }))
+        }
+        className="p-2 border border-gray-300 rounded-lg"
+      />
+    </div>
+  );
+}
+
+
+function Birthdate({ formData, handleChange }) {
+  return (
+    <div>
+      <input
+        type="date"
+        name="birthdate"
+        value={formData.birthdate}
+        onChange={handleChange}
+        className="block mb-4 p-2 border border-gray-300 rounded-lg"
+      />
+    </div>
+  );
+}
 
 export default function Onboarding() {
   const [step, setStep] = useState(1);
@@ -42,7 +153,6 @@ export default function Onboarding() {
   const handlePrev = () => setStep((prev) => prev - 1);
 
   const handleChange = (e) => {
-    // e.preventDefault();
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
@@ -59,7 +169,7 @@ export default function Onboarding() {
   } 
 
   const handleSubmit = async () => {
-    try {
+    try {      
       // console.log("FORM", formData)
       
       // Create a random UUID for the new record
@@ -108,117 +218,6 @@ export default function Onboarding() {
       </div>
     );
   };
-
-  function EmailAndPassword({ formData, handleChange }) {
-    return (
-      <div>
-        <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          value={formData.email}
-          onChange={handleChange}
-          className="block mb-4 p-2 border border-gray-300 rounded-lg w-64"
-        />
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          value={formData.password}
-          onChange={handleChange}
-          className="block mb-4 p-2 border border-gray-300 rounded-lg w-64"
-        />
-      </div>
-    );
-  }
-
-  function AboutMe({ formData, handleChange }) {
-    return (
-      <div>
-        <textarea
-          name="aboutMe"
-          placeholder="About Me"
-          value={formData.aboutMe}
-          onChange={handleChange}
-          className="block mb-4 p-2 border border-gray-300 rounded-lg w-64 h-24"
-        />
-      </div>
-    );
-  }
-  
-  function Address({ formData, setFormData }) {
-    return (
-      <div className="grid grid-cols-2 gap-4">
-        <input
-          type="text"
-          name="street"
-          placeholder="Street Address"
-          value={formData.address.street}
-          onChange={(e) =>
-            setFormData((prev) => ({
-              ...prev,
-              address: { ...prev.address, street: e.target.value },
-            }))
-          }
-          className="p-2 border border-gray-300 rounded-lg"
-        />
-        <input
-          type="text"
-          name="city"
-          placeholder="City"
-          value={formData.address.city}
-          onChange={(e) =>
-            setFormData((prev) => ({
-              ...prev,
-              address: { ...prev.address, city: e.target.value },
-            }))
-          }
-          className="p-2 border border-gray-300 rounded-lg"
-        />
-        <input
-          type="text"
-          name="state"
-          placeholder="State"
-          value={formData.address.state}
-          onChange={(e) =>
-            setFormData((prev) => ({
-              ...prev,
-              address: { ...prev.address, state: e.target.value },
-            }))
-          }
-          className="p-2 border border-gray-300 rounded-lg"
-        />
-        <input
-          type="text"
-          name="zip"
-          placeholder="ZIP Code"
-          value={formData.address.zip}
-          onChange={(e) =>
-            setFormData((prev) => ({
-              ...prev,
-              address: { ...prev.address, zip: e.target.value },
-            }))
-          }
-          className="p-2 border border-gray-300 rounded-lg"
-        />
-      </div>
-    );
-  }
-  
-  
-  function Birthdate({ formData, handleChange }) {
-    return (
-      <div>
-        <input
-          type="date"
-          name="birthdate"
-          value={formData.birthdate}
-          onChange={handleChange}
-          className="block mb-4 p-2 border border-gray-300 rounded-lg"
-        />
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-white flex flex-col items-center justify-center p-4">
